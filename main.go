@@ -35,10 +35,11 @@ func getUserProfile(userID int) (*UserProfile, error) {
 		wg = &sync.WaitGroup{}
 	)
 
+	// these could be remote calls to third part api's
 	go getComments(userID, respCh, wg)
 	go getLikes(userID, respCh, wg)
 	go getFriends(userID, respCh, wg)
-	wg.Add(3)
+	wg.Add(3) // because 3 Go Routine requests
 	wg.Wait()
 	close(respCh)
 
@@ -49,9 +50,10 @@ func getUserProfile(userID int) (*UserProfile, error) {
 			return nil, resp.err
 		}
 		switch msg := resp.data.(type) {
+		// could make types for each and refactor
 		case int:
 			userProfile.Likes = msg
-		case []int:
+		case []int: 
 			userProfile.Friends = msg
 		case []string:
 			userProfile.Comments = msg
